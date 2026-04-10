@@ -41,6 +41,8 @@ filterButtons.forEach(btn => {
     });
 });
 
+
+
 function addTask() {
     const text = taskInput.value.trim();
 
@@ -80,9 +82,15 @@ function addTask() {
 
 // Render
 function renderTasks() {
+
+
     taskList.innerHTML = "";
 
     let filteredTasks = [];
+
+
+
+
 
     if (currentFilter === 'all') {
         filteredTasks = tasks;
@@ -90,6 +98,11 @@ function renderTasks() {
         filteredTasks = tasks.filter(task => !task.done);
     } else if (currentFilter === 'done') {
         filteredTasks = tasks.filter(task => task.done);
+    }
+
+    if (filteredTasks.length === 0) {
+        taskList.innerHTML = "<p style='text-align:center;color:gray;'>No tasks yet 🚀</p>";
+        return;
     }
 
     filteredTasks.forEach(task => createTask(task));
@@ -151,6 +164,7 @@ function createTask(task) {
             });
         });
 
+        
     });
 
     li.appendChild(span);
