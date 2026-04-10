@@ -54,6 +54,7 @@ input {
 input:focus {
   border-color: #667eea;
   box-shadow: 0 0 0 2px rgba(102,126,234,0.2);
+  margin-right: 10px;
 }
 
 /* Button */
@@ -135,6 +136,12 @@ li button:nth-child(2) {
 
 li button:nth-child(2):hover {
   background: #26a69a;
+}
+
+li.removing {
+  opacity: 0;
+  transform: translateX(50px);
+  transition: 0.3s;
 }
 
 /* Done */
