@@ -1,21 +1,156 @@
+/* Reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Background */
 body {
-    font-family: Arial, sans-serif;
-    max-width: 400px;
-    margin: 50px auto;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  min-height: 100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* App Card */
+.app {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  width: 400px;
+  max-width: 90%;
+
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Title */
+h1 {
+  text-align: center;
+}
+
+/* Input group */
+.input-group {
+  display: flex;
+  gap: 10px;
+}
+
+input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  outline: none;
+  transition: 0.2s;
+}
+
+input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102,126,234,0.2);
+}
+
+/* Button */
+button {
+  padding: 10px 15px;
+  border: none;
+  background: #667eea;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  background: #5a67d8;
+}
+
+/* Filters */
+#filters {
+  display: flex;
+  gap: 5px;
+}
+
+#filters button {
+  flex: 1;
+  background: #eee;
+  color: #333;
+}
+
+#filters button:hover {
+  background: #ddd;
+}
+
+#filters button.active {
+  background: #667eea;
+  color: white;
+}
+
+/* List */
+ul {
+  list-style: none;
 }
 
 li {
-    margin: 10px 0;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
+  background: #f9f9f9;
+  padding: 12px;
+  border-radius: 8px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  transition: 0.2s;
+  animation: fadeIn 0.2s ease;
 }
 
+li:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+}
+
+/* Delete Button */
+li button {
+  background: #ff6b6b;
+}
+
+li button:hover {
+  background: #e63946;
+}
+
+
+
+/* Edit Button */
+li button:nth-child(2) {
+  background: #4ecdc4;
+  margin-left: auto;
+  margin-right: 10px;
+}
+
+li button:nth-child(2):hover {
+  background: #26a69a;
+}
+
+/* Done */
 .done {
-    text-decoration: line-through;
-    color: red;
+  text-decoration: line-through;
+  color: gray;
 }
 
-button {
-    margin-left: 10px;
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

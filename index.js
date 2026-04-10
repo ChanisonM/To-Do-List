@@ -1,186 +1,212 @@
 let tasks = [];
-let data = [];
-let currentFilter = 'all'
+let currentFilter = 'all';
+
 const taskInput = document.getElementById("taskInput");
 const addBtn = document.getElementById("addBtn");
 const taskList = document.getElementById("taskList");
-const filterButtons = document.querySelectorAll("#filters button")
+const filterButtons = document.querySelectorAll("#filters button");
 
-// Focus on the input field when the page loads
+// Load tasks
 window.onload = function () {
     taskInput.focus();
-    
 
     try {
-        data = JSON.parse(localStorage.getItem("tasks")) || [];
+        tasks = JSON.parse(localStorage.getItem("tasks")) || [];
     } catch {
-        data = [];
+        tasks = [];
     }
-    if (data) {
-        tasks = data;
-        tasks.forEach((task) => {
-            createTask(task, false); // false means don't save to localStorage again
-        });
-        renderTasks()
-    }
-    
+
+    renderTasks();
 };
 
-// Event listener for the Add Task button
+// Add task
 addBtn.addEventListener("click", addTask);
 
-// Event listener for the Enter key in the input field
+// Enter key
 taskInput.addEventListener("keypress", function (e) {
     if (e.key === "Enter") {
         addTask();
     }
 });
 
-
+// Filter
 filterButtons.forEach(btn => {
     btn.addEventListener("click", () => {
-        currentFilter = btn.dataset.filter
-        // console.log(currentFilter);
+        currentFilter = btn.dataset.filter;
+
+        filterButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+
         renderTasks();
-    })
-})
-
-
+    });
+});
 
 function addTask() {
-    // Get the input value and trim whitespace
     const text = taskInput.value.trim();
 
-    // Validation: Check if the input is empty
-    if (text == "") {
-        alert("Please enter a task.");
+    if (text === "") {
+        // alert("Please enter a task.");
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Please enter a task.",
+            showConfirmButton: false,
+            timer: 1500
+        });
         return;
     }
 
-    // Create a new task object
+
     const newTask = {
         id: Date.now(),
         text: text,
         done: false,
     };
+
     tasks.push(newTask);
+    Swal.fire({
+        position: "center",
+        icon: "success",
+        title: "Saved!",
+        showConfirmButton: false,
+        timer: 1500
+    });
     saveTasks();
     renderTasks();
-    
 
-
-
-    // Clear input and focus back to input field
     taskInput.value = "";
     taskInput.focus();
 }
 
-// Function to render tasks based on the current filter
+// Render
 function renderTasks() {
     taskList.innerHTML = "";
+
     let filteredTasks = [];
-    if(currentFilter === 'all'){
+
+    if (currentFilter === 'all') {
         filteredTasks = tasks;
-    }else if(currentFilter === 'active'){
+    } else if (currentFilter === 'active') {
         filteredTasks = tasks.filter(task => !task.done);
-    }else if(currentFilter === 'completed'){
+    } else if (currentFilter === 'done') {
         filteredTasks = tasks.filter(task => task.done);
     }
-    filteredTasks.forEach(task => createTask(task, false));
+
+    filteredTasks.forEach(task => createTask(task));
 }
 
-// Function to create a new task element and append it to the task list
-// ฟังชันนี้จะสร้าง element ของ task ใหม่และเพิ่มเข้าไปใน list ของ task
-function createTask(newTask, save = true) {
+// Create task
+function createTask(task) {
     const li = document.createElement("li");
     const span = document.createElement("span");
-    // Set the text content of the span to the task text
-    span.textContent = newTask.text;
+    const editBtn = document.createElement("button");
+    editBtn.textContent = "Edit";
 
 
 
-    // If the task is marked as done, add the 'done' class to the span
-    if (newTask.done) {
+    span.textContent = task.text;
+
+    if (task.done) {
         span.classList.add("done");
     }
 
-    // Event listener for toggling the done state of the task
-    span.addEventListener("click", function () {
-        span.classList.toggle("done");
-        newTask.done = !newTask.done;
+    // Toggle done
+    span.addEventListener("click", () => {
+        task.done = !task.done;
+
         saveTasks();
+        renderTasks();
     });
 
 
-    // Event listener for editing the task on double-click
-    span.addEventListener('dblclick', () => {
-        editTask(span, newTask);
+    editBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        editTask(span, task);
     })
 
-    // Delete Button
+    // Delete
     const deleteBtn = document.createElement("button");
     deleteBtn.textContent = "Delete";
-    deleteBtn.addEventListener("click", function (e) {
-        e.stopPropagation(); // Prevent the click from bubbling up to the span
-        taskList.removeChild(li);
-        // Remove the task from the tasks array and update localStorage
-        tasks = tasks.filter((task) => task.id !== newTask.id);
-        saveTasks();
+
+    deleteBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        tasks = tasks.filter(t => t.id !== task.id);
+
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!"
+        }).then((result) => {
+            if (result.isConfirmed) Swal.fire({
+                title: "Deleted!",
+                text: "Your data has been deleted.",
+                icon: "success",
+            }).then(() => {
+                saveTasks();
+                renderTasks();
+            });
+        });
+
     });
 
-    // Append elements
     li.appendChild(span);
+    li.appendChild(editBtn);
     li.appendChild(deleteBtn);
     taskList.appendChild(li);
-
-    // Save the task to localStorage if save is true
-    if (save) {
-        tasks.push(newTask);
-        saveTasks();
-    }
 }
 
-// Function to edit a task
-function editTask(span, newTask) {
-    // Create an input field and replace the span with it
-    const input = document.createElement("input")
+// Edit
+function editTask(span, task) {
+    const input = document.createElement("input");
     input.type = "text";
-    input.value = newTask.text 
+    input.value = task.text;
+
     span.replaceWith(input);
     input.focus();
 
-    // Event listener for saving the edited task on Enter key press
-    input.addEventListener("keypress" , (e) => {
-        if(e.key === "Enter") {
-            saveEdit(input, span, newTask)
+    input.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+            saveEdit(input, task);
         }
-    })
-    // Event listener for saving the edited task when the input loses focus
+    });
+
     input.addEventListener("blur", () => {
-        saveEdit(input, span, newTask)
-    })
+        Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Saved!",
+            showConfirmButton: false,
+            timer: 1500
+        });
+        saveEdit(input, task);
+    });
 }
 
-// Function to save the edited task
-function saveEdit(input, span, newTask) {
-    
-    const newText =  input.value.trim()
-    if(newText === ""){
-        alert("Task cannot be empty.")
-        input.focus();
+// Save edit
+function saveEdit(input, task) {
+    const newText = input.value.trim();
+
+    if (newText === "") {
+        // alert("Task cannot be empty.");
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Task cannot be empty.",
+        });
         return;
     }
-    newTask.text = newText;
-    span.textContent = newText;
 
-    input.replaceWith(span);
-    saveTasks()
-
+    task.text = newText;
+    saveTasks();
+    renderTasks();
 }
 
-
-// Function to save tasks to localStorage
+// Save
 function saveTasks() {
+
     localStorage.setItem("tasks", JSON.stringify(tasks));
 }
-
